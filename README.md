@@ -50,7 +50,6 @@ Crypto.encriptaArchivo("archivo.pdf", False)
 # Encriptar un directorio
 Crypto.encriptaDirectorio("directorio", False)
 
-
 # Selecciona la llave privada con la que desencriptar
 Crypto.usaLlave('mi_llave_privada.pem', 'private')
 
