@@ -1,5 +1,5 @@
 # TeKrypto
-Una clase Python para encriptar y desencriptar un directorio y con posibilidad de enviarlo por FTP
+Una clase Python para encriptar y desencriptar un directorio y con posibilidad de enviarlo a un servidor remoto por FTP.
 
 ## Características
 Es una clase escrita para trabajar en un entorno limitado a Python 2.6 y testeada solo hasta Python 2.7 así que a menos que por arte de magia todo funcione en versiones superiores o que en el núcleo de tu sistema ya tengas Python 2.7, por ahora lo ideal es crear un *virtualenv* con python 2.7.
@@ -53,3 +53,6 @@ crypt.desencriptaDirectorio("data/Documentos", False)
 # Sube directorio/archivo por FTP
 Crypto.ftp("data/")
 ```
+## FTP
+
+La configuración del FTP en el archivo FTP.py
