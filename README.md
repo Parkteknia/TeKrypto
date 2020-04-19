@@ -7,7 +7,7 @@ Es una clase escrita para trabajar en un entorno limitado a Python 2.6 y testead
 La clase permite:
 * La creación del par de llaves privada/pública
 * La encriptación y desencrptación mediante cifrado AES (Advanced Encryption Standard) de archivos/directorios
-* El envío mediante FTP (También se ha tenido que optar por FTP por limitaciones del entorno.
+* El envío mediante FTP (También se ha tenido que optar por FTP por limitaciones del entorno).
 
 ## Requerimientos
 La clase requiere el paquete [PyCryptodome](https://pycryptodome.readthedocs.io/en/latest/src/installation.html "PyCryptodome's Installation") el cual instala Crypto v. 3.9.7. y el resto de módulos necesarios.
