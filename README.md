@@ -4,6 +4,13 @@ Una clase Python para encriptar y desencriptar un directorio y con posibilidad d
 ## Características
 Es una clase escrita para trabajar en un entorno limitado a Python 2.6 y testeada solo hasta Python 2.7 así que a menos que por arte de magia todo funcione en versiones superiores o que en el núcleo de tu sistema ya tengas Python 2.7, por ahora lo ideal es crear un *virtualenv* con python 2.7.
 
+## TODO
+* Actualmente no encripta el nombre ni del archivo ni del direcotrio, solo el contenido. (Implementar)
+* Añadir extensiones dinámicas
+* Mejorar los destinos/directorio de ambos procesos
+* Mejorar el sistema de logs/preport de cada procesamiento
+* Lanzado por CRON
+
 La clase permite:
 * La creación del par de llaves privada/pública
 * La encriptación y desencrptación mediante cifrado AES (Advanced Encryption Standard) de archivos/directorios
@@ -56,3 +63,4 @@ Crypto.ftp("data/")
 ## FTP
 
 La configuración del FTP en el archivo FTP.py
+Cada sesión FTP genera en el directorio FTP destino una carpeta con un nombre tipo: 2020-04-19 15:46:07 con los archivos/directorios encriptados dentro.
