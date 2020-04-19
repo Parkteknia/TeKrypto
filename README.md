@@ -28,6 +28,8 @@ La clase no requiere instalación, únicamente descarga los archivos o clónalos
 
 ## Uso
 
+Por ejemplo el archivo test.py
+
 ```python
 from TeKrypto import Tekripto
 
@@ -61,6 +63,13 @@ crypt.desencriptaDirectorio("data/Documentos", False)
 # Sube directorio/archivo por FTP
 Crypto.ftp("data/")
 ```
+
+Y para llamarlo simplemente desde la terminal:
+
+```shell
+python test.py
+```
+
 ## FTP
 
 * La configuración del FTP en el archivo FTP.py
