@@ -63,5 +63,5 @@ Crypto.ftp("data/")
 ```
 ## FTP
 
-La configuración del FTP en el archivo FTP.py
-Cada sesión FTP genera en el directorio FTP destino una carpeta con un nombre tipo: 2020-04-19 15:46:07 con los archivos/directorios encriptados dentro.
+* La configuración del FTP en el archivo FTP.py
+* Cada sesión FTP genera en el directorio FTP destino una carpeta con un nombre tipo: 2020-04-19 15:46:07 con los archivos/directorios encriptados dentro.
