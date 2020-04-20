@@ -3,10 +3,9 @@ Una clase Python para encriptar y desencriptar un directorio y con posibilidad d
 
 ## Características
 Es una clase escrita para trabajar en un entorno limitado a Python 2.6 y testeada solo hasta Python 2.7 así que a menos que por arte de magia todo funcione en versiones superiores o que en el núcleo de tu sistema ya tengas Python 2.7, por ahora lo ideal es crear un *virtualenv* con python 2.7.
-``diff
 
+```diff
 + Se ha creado en la carpeta 3.5 el script actualizado para correr en Python 3.5+
-
 ```
 
 La clase permite:
