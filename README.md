@@ -28,45 +28,55 @@ La clase no requiere instalación, únicamente descarga los archivos o clónalos
 
 ## Uso
 
-Por ejemplo el archivo test.py
+Por ejemplo el archivo test.py mejor comentar las acciones por partes:
 
 ```python
+# se importa la clase
 from TeKrypto import Tekripto
 
-# Ver la documentación en la propia clase
+# Ver más documentación en la propia clase
 
 # Instancia la clase
 Crypto = TeKrypto()
-
+```
+Ahora para generar un par de llaves:
+```
 # Generar llaves (nombre de las llaves sin extensión y el tamaño de la llave)
 Crypto.generaLLaves('mi_llave_privada', 'mi_llave_publica', 4096)
-
+```
+Para comprimir un directorio:
+```
 # Selecciona la llave pública con la que encriptar
 Crypto.usaLlave('mi_llave_publica.pem', 'public')
-
-# Encriptar un archivo 
-Crypto.encriptaArchivo("archivo.pdf", False)
 
 # Encriptar un directorio
 Crypto.encriptaDirectorio("directorio", False)
 
-# Selecciona la llave privada con la que desencriptar
-Crypto.usaLlave('mi_llave_privada.pem', 'private')
-
-# Desencripta un archivo
-Crypto.desencriptaArchivo("archivo.pdf.crypt", False)
-
-# Desencripta un direcotrio
-crypt.desencriptaDirectorio("data/Documentos", False)
-
+# O encriptar un archivo (comentada)
+#Crypto.encriptaArchivo("archivo.pdf", False)
+```
+Para enviar un directorio por FTP:
+```
 # Sube directorio/archivo por FTP
 Crypto.ftp("data/")
 ```
+Para desencriptar un directorio:
+```
+# Selecciona la llave privada con la que desencriptar
+Crypto.usaLlave('mi_llave_privada.pem', 'private')
 
-Y para llamarlo simplemente desde la terminal:
+
+# Desencripta un direcotrio
+Crypt.desencriptaDirectorio("data/Documentos", False)
+
+# O desencripta un archivo (comentada)
+#Crypto.desencriptaArchivo("archivo.pdf.crypt", False)
+
+```
+Y para llamarlo el script simplemente desde la terminal:
 
 ```shell
-python test.py
+python test.py o python3 test.py
 ```
 
 ## FTP
