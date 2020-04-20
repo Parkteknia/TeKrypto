@@ -39,13 +39,17 @@ from TeKrypto import Tekripto
 # Instancia la clase
 Crypto = TeKrypto()
 ```
+
 Ahora para generar un par de llaves:
-````python
+
+```python
 # Generar llaves (nombre de las llaves sin extensión y el tamaño de la llave)
 Crypto.generaLLaves('mi_llave_privada', 'mi_llave_publica', 4096)
 ```
+
 Para comprimir un directorio:
-````python
+
+```python
 # Selecciona la llave pública con la que encriptar
 Crypto.usaLlave('mi_llave_publica.pem', 'public')
 
@@ -55,13 +59,17 @@ Crypto.encriptaDirectorio("directorio", False)
 # O encriptar un archivo (comentada)
 #Crypto.encriptaArchivo("archivo.pdf", False)
 ```
+
 Para enviar un directorio por FTP:
-````python
+
+```python
 # Sube directorio/archivo por FTP
 Crypto.ftp("data/")
 ```
+
 Para desencriptar un directorio:
-````python
+
+```python
 # Selecciona la llave privada con la que desencriptar
 Crypto.usaLlave('mi_llave_privada.pem', 'private')
 
@@ -73,6 +81,7 @@ Crypt.desencriptaDirectorio("data/Documentos", False)
 #Crypto.desencriptaArchivo("archivo.pdf.crypt", False)
 
 ```
+
 Y para llamarlo el script simplemente desde la terminal:
 
 ```shell
