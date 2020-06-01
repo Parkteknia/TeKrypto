@@ -5,7 +5,7 @@ Una clase Python para encriptar y desencriptar un directorio y con posibilidad d
 Es una clase escrita para trabajar en un entorno limitado a Python 2.6 y testeada solo hasta Python 2.7 así que a menos que por arte de magia todo funcione en versiones superiores o que en el núcleo de tu sistema ya tengas Python 2.7, por ahora lo ideal es crear un *virtualenv* con python 2.7.
 
 ```diff
-+ Se ha creado en la carpeta 3.5 el script actualizado para correr en Python 3
++ El script se ha actualizado para correr en Python 3.8
 ```
 
 La clase permite:
@@ -32,26 +32,16 @@ La clase no requiere instalación, únicamente descarga los archivos o clónalos
 
 ## Uso
 
-Por ejemplo el archivo test.py mejor comentar las acciones por partes:
+Lo primero es crear el par de llaves privada/publica, por defecto usa los nombres keys/mi_llave_privada.pem y keys/mi_llave_publica.pem
 
-```python
-# se importa la clase
-from TeKrypto import Tekripto
+Para crear las llaves se ejectua desde la terminal en el directorio TeCrypto:
 
-# Ver más documentación en la propia clase
-
-# Instancia la clase
-Crypto = TeKrypto()
+```shell
+python generaLlaves.py
 ```
 
-Ahora para generar un par de llaves:
-
-```python
-# Generar llaves (nombre de las llaves sin extensión y el tamaño de la llave)
-Crypto.generaLLaves('mi_llave_privada', 'mi_llave_publica', 4096)
-```
-
-Para comprimir un directorio:
+Una vez se han generado el par de llaves, para encriptar un directorio se puede ejecutar el archivo test.py con las siguientes instrucciones descomentdas. Para encriptar se usa la llave pública.pem y para desencriptar la llave privada.pem.
+Si no se hace así, al desencriptar dará error RSA.
 
 ```python
 # Selecciona la llave pública con la que encriptar
@@ -86,10 +76,10 @@ Crypt.desencriptaDirectorio("data/Documentos", False)
 
 ```
 
-Y para llamarlo el script simplemente desde la terminal:
+Y para llamar al script simplemente desde la terminal:
 
 ```shell
-python test.py o python3 test.py
+python test.py
 ```
 
 ## FTP
