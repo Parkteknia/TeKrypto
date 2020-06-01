@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 import os
@@ -16,7 +16,7 @@ class TeKrypto():
 	# Inicializa la clase y el objeto keys
 	#
 	#
-    	##
+	##
 	
 	def __init__(self):
 
@@ -28,9 +28,9 @@ class TeKrypto():
 	# Generar las llaves RSA
 	#
 	# Args:
-    	#    priv_key (str): El nombre de la llave privada sin extensión.
-   	#    pub_key  (str): El nombre de la llave pública sin extensión.
-   	#	 size	  (int): El tamaño de la llave (2048, 3072, 4096) bits.
+	#    priv_key (str): El nombre de la llave privada sin extensión.
+	#    pub_key  (str): El nombre de la llave pública sin extensión.
+	#	 size	  (int): El tamaño de la llave (2048, 3072, 4096) bits.
 	#
 	#	Returns:
 	#		bool: The return value. True for success, False otherwise.
@@ -53,20 +53,20 @@ class TeKrypto():
 		self.keys['public'] = self.keys_path + pub_key + '.pem'
 		self.guardaLlave(self.keys['public'], llave_publica)
 
-		print "Se generararon las llaves:", self.keys
+		print("Se generararon las llaves en la carpeta keys/:", self.keys)
 
 	######################################################################################
 	#
 	# Función para encriptar archivo
 	#
 	# Args:
-    	#    archivo (str): El nombre del archivo donde se guardará la llave
-    	#    llave  (str): La llave
+	#    archivo (str): El nombre del archivo donde se guardará la llave
+	#    llave  (str): La llave
 	##
 	
 	def guardaLlave(self, archivo, llave):
 
-		file = open(archivo,"w") 
+		file = open(archivo,"wb") 
 		file.write(llave)
 		file.close()
 
@@ -75,8 +75,8 @@ class TeKrypto():
 	# Setea la llave pública para encriptar
 	#
 	# Args:
-    	#    nombre_llave (str): El nombre de la llave pública
-    	#    tipo  (str): publica/privada
+	#    nombre_llave (str): El nombre de la llave pública
+	#    tipo  (str): publica/privada
 	##
 
 	def usaLlave(self, nombre_llave, tipo):
@@ -87,18 +87,19 @@ class TeKrypto():
 	# Encriptar archivo
 	#
 	# Args:
-    	#    archivo (str): El nombre del archivo a encriptar
-    	#	 preserva (bool) : Si machaca original o guarda nuevo
+	#    archivo (str): El nombre del archivo a encriptar
+	#	 preserva (bool) : Si machaca original o guarda nuevo
 	##
 
 	def encriptaArchivo(self, archivo, preserva):
-
-		rsa_public_key = RSA.importKey(open(self.keys['public'], "r"))
+                
+		rsa_public_key = RSA.importKey(open(self.keys['public']).read())
 		self.rsa_public_key = PKCS1_OAEP.new(rsa_public_key)
 		
 		contenido = self.leeArchivo(archivo)
 
 		if not preserva:
+			to_delete = archivo
 			archivo = archivo + ".crypt"
 
 		session_key = get_random_bytes(16)
@@ -107,14 +108,16 @@ class TeKrypto():
 		cipher_aes = AES.new(session_key, AES.MODE_EAX)
 
 		self.guardaArchivoEncriptado(archivo, contenido, enc_session_key, cipher_aes)
+		if not preserva:
+			os.remove(to_delete)
 
 	######################################################################################
 	#
 	# Desencriptar archivo
 	#
 	# Args:
-    	#    archivo (str): El nombre del archivo a encriptar
-    	#	 preserva (bool) : Si machaca original o guarda nuevo
+	#    archivo (str): El nombre del archivo a encriptar
+	#	 preserva (bool) : Si machaca original o guarda nuevo
 	##
 	
 	def desencriptaArchivo(self, archivo, preserva):
@@ -122,7 +125,7 @@ class TeKrypto():
 		#contenido = self.leeArchivo(archivo)
 		contenido = open(archivo, "rb")
 
-		rsa_private_key = RSA.importKey(open(self.keys['private'], "r"))
+		rsa_private_key = RSA.importKey(open(self.keys['private']).read())
 		self.rsa_private_key = PKCS1_OAEP.new(rsa_private_key)
 		
 		enc_session_key, nonce, tag, ciphertext = \
@@ -148,8 +151,8 @@ class TeKrypto():
 	# Encripta directorio
 	#
 	# Args:
-   	#    direcotrio (str): El nombre del directorio a encriptar
-    	#	 preserva (bool) : Si machaca original o guarda nuevo
+	#    direcotrio (str): El nombre del directorio a encriptar
+	#	 preserva (bool) : Si machaca original o guarda nuevo
 	##
 		
 	def encriptaDirectorio(self, directorio, preserva):
@@ -167,8 +170,8 @@ class TeKrypto():
 	# Desncripta directorio
 	#
 	# Args:
-    	#    direcotrio (str): El nombre del directorio a encriptar
-    	#	 preserva (bool) : Si machaca original o guarda nuevo
+	#    direcotrio (str): El nombre del directorio a encriptar
+	#	 preserva (bool) : Si machaca original o guarda nuevo
 	##
 		
 	def desencriptaDirectorio(self, directorio, preserva):
@@ -188,10 +191,10 @@ class TeKrypto():
 	# Lee contenido archivo
 	#
 	# Args:
-    	#    archivo (str): El nombre del archivo  a leer
-    	#
-    	# Returns:
-    	#	 arcvhio binario contents
+	#    archivo (str): El nombre del archivo  a leer
+	#
+	# Returns:
+	#	 arcvhio binario contents
 	##
 										
 	def leeArchivo(self, archivo):
@@ -206,11 +209,11 @@ class TeKrypto():
 	# Encripta y Guarda el Arcvhivo encriptado
 	#
 	# Args:
-    	#    archivo (str): El nombre del archivo  final encriptado
-    	#    contenido (binary): Contenido de archivo a encriptar
-    	#    enc_session_key (int): La session del proceso  de encriptamiento
-    	#    cipher_aes: El cipher AES
-    	#
+	#    archivo (str): El nombre del archivo  final encriptado
+	#    contenido (binary): Contenido de archivo a encriptar
+	#    enc_session_key (int): La session del proceso  de encriptamiento
+	#    cipher_aes: El cipher AES
+	#
 	##
 	
 	def guardaArchivoEncriptado(self, archivo, contenido, enc_session_key, cipher_aes):
@@ -227,11 +230,11 @@ class TeKrypto():
 	# Desencripta y Guarda el Arcvhivo desencriptado
 	#
 	# Args:
-    	#    archivo (str): El nombre del archivo  final encriptado
-    	#    contenido (binary): Contenido de archivo a encriptar
-    	#    enc_session_key (int): La session del proceso  de encriptamiento
-    	#    cipher_aes: El cipher AES
-    	#
+	#    archivo (str): El nombre del archivo  final encriptado
+	#    contenido (binary): Contenido de archivo a encriptar
+	#    enc_session_key (int): La session del proceso  de encriptamiento
+	#    cipher_aes: El cipher AES
+	#
 	##
 	
 	def guardaArchivoDesencriptado(self, archivo, contenido):
@@ -242,4 +245,3 @@ class TeKrypto():
 
 	def ftp(self, directorio):
 		return TeFTP(directorio)
-			
