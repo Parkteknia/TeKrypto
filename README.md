@@ -3,7 +3,7 @@ src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/01.png"
 alt="TeKrypto Home"
 />
 
-# TeKrypto
+# TeKrypto v1.0
 Una clase Python para encriptar y desencriptar datos.
 
 ## Características
