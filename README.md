@@ -39,7 +39,7 @@ The keys are generated and stored in the folder keys/
 ```
 
 Una vez se han generado el par de llaves, para encriptar un archivo o directorio se ejecuta de la siguiente forma:
-```python
+```shell
 python3 TeKrypto.py -a encrypt
 Indicate the path of the file/directory to encrypt: /home/user/my_files/
 Do you want to preserve the unencrypted file/directory? Type 'y' for yes and 'n' for no. n
@@ -48,7 +48,7 @@ Directory/File successfully encrypted: /home/user/my_files/
 ```
 Para desencriptar un directorio:
 
-```python
+```shell
 python3 TeKrypto.py -a decrypt
 Indicate the path of the directory/file to decrypt: /home/user/my_files/
 Do you want to preserve the decrypted directory/file? Type 'y' for yes and 'n' for no. n
