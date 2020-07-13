@@ -26,12 +26,6 @@ class Colorize:
 	UNDERLINE = '\033[4m'
 	END = '\033[0m'
 
-
-
-banner  = base64.b64decode(f"CgogX19fX18gICAgXyAgX18gICAgICAgICAgICAgICAgIF8gICAgICAgIF8KfF8gICBffF9ffCB8LyAvXyBfXyBfICAgXyBfIF9fIHwgfF8gX19fIHwgfAogIHwgfC8gXyBcICcgL3wgJ19ffCB8IHwgfCAnXyBcfCBfXy8gXyBcfCB8CiAgfCB8ICBfXy8gLiBcfCB8ICB8IHxffCB8IHxfKSB8IHx8IChfKSB8X3wKICB8X3xcX19ffF98XF9cX3wgICBcX18sIHwgLl9fLyBcX19cX19fLyhfKQogICAgICAgICAgICAgICAgICAgIHxfX18vfF98CgogICAgICBUZUtyeXB0byAxLjAgYnkgQXJ0ZWtuaWEub3JnIC0gMjAyMAo=").decode()
-
-print(Colorize.YELLOW + Colorize.BOLD + "\n\n" + banner + Colorize.END)
-
 class TeKrypto():
 
 
@@ -300,6 +294,11 @@ def get_args():
 	return parser.parse_args()
 
 if __name__ == '__main__':
+
+	banner  = base64.b64decode(f"CgogX19fX18gICAgXyAgX18gICAgICAgICAgICAgICAgIF8gICAgICAgIF8KfF8gICBffF9ffCB8LyAvXyBfXyBfICAgXyBfIF9fIHwgfF8gX19fIHwgfAogIHwgfC8gXyBcICcgL3wgJ19ffCB8IHwgfCAnXyBcfCBfXy8gXyBcfCB8CiAgfCB8ICBfXy8gLiBcfCB8ICB8IHxffCB8IHxfKSB8IHx8IChfKSB8X3wKICB8X3xcX19ffF98XF9cX3wgICBcX18sIHwgLl9fLyBcX19cX19fLyhfKQogICAgICAgICAgICAgICAgICAgIHxfX18vfF98CgogICAgICBUZUtyeXB0byAxLjAgYnkgQXJ0ZWtuaWEub3JnIC0gMjAyMAo=").decode()
+
+	print(Colorize.YELLOW + Colorize.BOLD + "\n\n" + banner + Colorize.END)
+
 	args = get_args()
 	if args:
 		if args.action == "generate_keys":
