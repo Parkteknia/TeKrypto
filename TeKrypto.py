@@ -449,9 +449,9 @@ if __name__ == '__main__':
 			Crypto.usaLlave(key, 'private')
 
 			if type == "f":
-				# Encriptar un archivo
+				# Desencriptar un archivo
 				Crypto.desencriptaArchivo(path, prsv)
 
 			if type == "d":
-				# Encriptar un directorio
+				# Desencriptar un directorio
 				Crypto.desencriptaDirectorio(path, prsv)
