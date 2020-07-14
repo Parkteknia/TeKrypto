@@ -19,7 +19,7 @@ La clase requiere el paquete [PyCryptodome](https://pycryptodome.readthedocs.io/
 pip install pycryptodome
 ```
 ## Configuración y modos de utilización
-En esta versión se ha añadido una funcionalidad de configuración mediante el archivo config.ini, así TeCrypto podrá correr de forma manual, semi-manual y automatizada (para ser lanzado mediante CRON). Ahora solo está implementada la versión Manual.
+En la versión 1.0.2 se ha añadido la posibilidad de configurar mediante el archivo config.ini algunos parámetros.
 
 Se comentan las variables de la sección General de configuración del archivo config.ini:
 ```shell
