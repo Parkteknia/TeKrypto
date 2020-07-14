@@ -41,7 +41,7 @@ alt="TeKrypto Generating Keys"
 
 Una vez se han generado el par de llaves, para encriptar un archivo o directorio se ejecuta de la siguiente forma:
 ```shell
-python3 TeKrypto.py -a encrypt
+python3 TeKrypto.py --action encrypt
 ```
 <img
 src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/0102-encrypting.png"
@@ -52,7 +52,7 @@ alt="TeKrypto Generating Keys"
 Para desencriptar un archivo/directorio:
 
 ```shell
-python3 TeKrypto.py -a decrypt
+python3 TeKrypto.py --action decrypt
 ```
 <img
 src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/0102-decrypting.png"
