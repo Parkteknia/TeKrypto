@@ -21,6 +21,15 @@ pip install pycryptodome
 ## Configuración y modos de utilización
 En esta versión se ha añadido una funcionalidad nueva de configuración mediante el archivo config.ini, así TeCrypto podrá correr de forma manual, semi-manual y automatizada (para ser lanzado mediante CRON). Ahora solo está implementada la versión Manual.
 
+Se comentan las variables funcionales en el archivo config.ini:
+```shell
+[General]
+Mode: Manual (En esta versión el único modo)
+EncryptNames: False (Para encriptar también los nombres de los archivos. En esta versión el único modo)
+KeysPath: (Si quieres mantener tus llaves en otra hubicación, indica la ruta absoluta a tu repositorio)
+DefaultDataPath: (Si quieres indicar la ruta absoluta donde se encuentra tu carpeta de datos, de este modo cuando encriptas o desencriptas puedes indicar solo el nombre de la carpeta)
+```
+
 ## Uso en modo "Manual"
 
 Lo primero es crear el par de llaves privada/publica.
