@@ -32,11 +32,11 @@ DefaultDataPath:
 ##### Mode: (Manual, Semi-Manual, Automate)
 En esta versión el único modo funcional es el Manual, pero en la siguiente se podrán lanzar procesos automatizados o aligerar más, si cabe, el modo manual.
 ##### EncryptNames: (False, True)
-Para encriptar también los nombres de los archivos. En esta versión el único modo activo es False, es decir no encrypta en nombre del archivo o directorio.
+Para encriptar también los nombres de los archivos. En esta versión el único modo activo es False, es decir no encrypta el nombre del archivo o directorio.
 ##### KeysPath: (Absolute Path, c:/files or /home/user/files, etc.)
 Si quieres mantener tus llaves en otra hubicación puedes indicar la ruta absoluta a tu repositorio de llaves.
 ##### DefaultDataPath: (Absolute Path, c:/data_folder or /home/user/data_folder, etc.)
-Si quieres indicar la ruta absoluta donde se encuentra tu carpeta de datos, de este modo cuando encriptas o desencriptas puedes indicar solo el nombre de la carpeta. Tambien será necesario para correr en modo Automate.
+Si quieres indicar la ruta absoluta donde se encuentra tu carpeta de datos, de este modo cuando encriptas o desencriptas puedes indicar solo el nombre de la carpeta con la que quieres trabajar sin necesidad de indicar la ruta absoluta. Tambien será necesario para correr en modo Automate.
 
 ## Uso en modo "Manual"
 
