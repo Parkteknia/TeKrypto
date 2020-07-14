@@ -34,7 +34,7 @@ python3 TeKrypto.py --action generate_keys
 ```
 <img
 src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/0102-generate-keys.png"
-alt="TeKrypto Home"
+alt="TeKrypto Generating Keys"
 />
 
 ### Encriptación de datos
@@ -42,8 +42,11 @@ alt="TeKrypto Home"
 Una vez se han generado el par de llaves, para encriptar un archivo o directorio se ejecuta de la siguiente forma:
 ```shell
 python3 TeKrypto.py -a encrypt
-Directory/File successfully encrypted: /home/user/my_files/
 ```
+<img
+src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/0102-encrypting.png"
+alt="TeKrypto Generating Keys"
+/>
 ### Desencriptación de datos
 
 Para desencriptar un archivo/directorio:
@@ -51,7 +54,10 @@ Para desencriptar un archivo/directorio:
 ```shell
 python3 TeKrypto.py -a decrypt
 ```
-
+<img
+src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/0102-decrypting.png"
+alt="TeKrypto Generating Keys"
+/>
 
 ## FTP y SFTP
 
