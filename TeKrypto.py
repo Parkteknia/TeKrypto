@@ -3,7 +3,9 @@
 
 import os
 import sys
+import platform
 import re
+import configparser
 import argparse
 import readline
 import base64
@@ -13,6 +15,7 @@ from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
 from libs.FTP import TeFTP
 
+from libs.Banner import get_banner
 
 class Colorize:
 	PURPLE = '\033[95m'
@@ -25,6 +28,7 @@ class Colorize:
 	BOLD = '\033[1m'
 	UNDERLINE = '\033[4m'
 	END = '\033[0m'
+
 
 class TeKrypto():
 
@@ -40,8 +44,47 @@ class TeKrypto():
 	def __init__(self):
 
 		self.global_error = False
-		self.keys_path = "keys/"
+		self.keys_path = self.load_config('General', 'KeysPath')
+		self.data_path = self.load_config('General', 'DefaultDataPath')
 		self.keys = {'private': '', 'public': ''}
+		self.mode = self.load_config('General', 'Mode')
+		self.computer = self.load_platform()
+
+
+	######################################################################################
+	#
+	# Carga el archivo de configuración
+	#
+	#
+	##
+
+	def load_config(self, section, param):
+		config = configparser.ConfigParser()
+		config._interpolation = configparser.ExtendedInterpolation()
+		try:
+			config.read("config/config.ini")
+		except Exception as ErrorConfig:
+			print(Colorize.RED + ErrorConfig + Colorize.END)
+
+		if param == "KeysPath":
+			kpath = config.get(section, param)
+			if not kpath:
+			    return os.path.dirname(os.path.realpath(__file__)) + "/keys/"
+			return kpath
+		return config.get(section, param)
+
+	######################################################################################
+	#
+	# Load Operating System information
+	#
+	#
+	##
+
+	def load_platform(self):
+		system = {'os': platform.system(), 'release': platform.release()}
+
+		return system
+
 
 	######################################################################################
 	#
@@ -73,7 +116,38 @@ class TeKrypto():
 		self.keys['public'] = self.keys_path + pub_key + '.pem'
 		self.guardaLlave(self.keys['public'], llave_publica)
 
-		print("The keys are generated and stored in the folder keys/:", self.keys)
+		print(Colorize.GREEN +  "Keys stored in the " + Colorize.END + "keys/" + Colorize.GREEN + " folder:" + Colorize.END, self.keys)
+
+	######################################################################################
+	#
+	# Key Exist
+	#
+	# Args:
+	#	key_name
+	#
+	#	Returns:
+	#		bool: True/False
+	##
+
+	def keyExist(self, key_name):
+		if os.path.exists(self.keys_path + key_name + ".pem"):
+			return True
+
+	######################################################################################
+	#
+	# Validate key name
+	#
+	# Args:
+	#	name
+	#
+	#	Returns:
+	#		bool: True/False
+	##
+
+	def validate_key_name(self, name):
+		new_name = name
+		if re.match("^[A-Za-z0-9_]+$", new_name):
+			return True
 
 	######################################################################################
 	#
@@ -118,9 +192,7 @@ class TeKrypto():
 
 		contenido = self.leeArchivo(archivo)
 
-		if False == bool(preserva):
-			to_delete = archivo
-			archivo = archivo + ".crypt"
+		archivo = archivo + ".crypt"
 
 		session_key = get_random_bytes(16)
 		enc_session_key = self.rsa_public_key.encrypt(session_key)
@@ -223,6 +295,7 @@ class TeKrypto():
 			print(Colorize.YELLOW + "Directory successfully decrypted: " + Colorize.END + directorio)
 		else:
 			print(Colorize.RED + "It looks like you are trying to decrypt an unencrypted file or dir!" + Colorize.END + directorio)
+
 	######################################################################################
 	#
 	# Lee contenido archivo
@@ -255,7 +328,6 @@ class TeKrypto():
 
 	def guardaArchivoEncriptado(self, archivo, contenido, enc_session_key, cipher_aes):
 
-		file= archivo
 		file_out = open(archivo, "wb")
 
 		ciphertext, tag = cipher_aes.encrypt_and_digest(contenido)
@@ -283,175 +355,197 @@ class TeKrypto():
 	def ftp(self, directorio):
 		return TeFTP(directorio)
 
-def validate_name(name):
-	new_name = name
-	if re.match("^[A-Za-z0-9_]+$", new_name):
-		return True
 
 def get_args():
-	parser = argparse.ArgumentParser(description='TeKrypto v1.0 by Arteknia.org - 2020')
-	parser.add_argument('-a','--action', type=str, required=True, help='Action to execute', choices=['generate_keys', 'encrypt', 'decrypt'])
+	parser = argparse.ArgumentParser()
+	parser.add_argument('--action', type=str, required=True, help='Action to execute', choices=['generate_keys', 'encrypt', 'decrypt'])
 	return parser.parse_args()
 
 if __name__ == '__main__':
 
-	banner  = base64.b64decode(f"CgogX19fX18gICAgXyAgX18gICAgICAgICAgICAgICAgIF8gICAgICAgIF8KfF8gICBffF9ffCB8LyAvXyBfXyBfICAgXyBfIF9fIHwgfF8gX19fIHwgfAogIHwgfC8gXyBcICcgL3wgJ19ffCB8IHwgfCAnXyBcfCBfXy8gXyBcfCB8CiAgfCB8ICBfXy8gLiBcfCB8ICB8IHxffCB8IHxfKSB8IHx8IChfKSB8X3wKICB8X3xcX19ffF98XF9cX3wgICBcX18sIHwgLl9fLyBcX19cX19fLyhfKQogICAgICAgICAgICAgICAgICAgIHxfX18vfF98CgogICAgICBUZUtyeXB0byAxLjAgYnkgQXJ0ZWtuaWEub3JnIC0gMjAyMAo=").decode()
-
+	# Print TeKrypto Banner
+	banner  = base64.b64decode(get_banner('1.0.2')).decode()
 	print(Colorize.YELLOW + Colorize.BOLD + "\n\n" + banner + Colorize.END)
 
+	# Create TeKrypto object
+	Crypto = TeKrypto()
+
+    #Print mode and environment info
+	print(Colorize.GREEN + "TeKrypto is configured in " + Colorize.END + Colorize.BOLD + Crypto.mode + Colorize.END + Colorize.GREEN  + " mode ->" + Colorize.END)
+	print(Colorize.GREEN + "Running in a " + Colorize.END + Colorize.BOLD + Crypto.computer['os'] + " " + Crypto.computer['release'] + Colorize.END + Colorize.GREEN  + " machine ->" + Colorize.END)
+	print("")
+
+	# Read args
 	args = get_args()
-	if args:
-		if args.action == "generate_keys":
-			print("Generating keys -->")
-			while True:
-				try:
-					private_name = input("Enter the name of the private key file without extension 'private_key_name': ")
-					if not private_name:
-						continue
-					if True != validate_name(private_name):
-						continue
-				except ValueError:
-					print("error")
-				else:
-					print("Private Key Name: " + private_name + ".key")
-					break
-			while True:
-				try:
-					public_name = input("Enter the name of the public key file without extension 'public_key_name': ")
-					if not public_name:
-						continue
-					if True != validate_name(public_name):
-						continue
-				except ValueError:
-					print("error")
-				else:
-					print("Public Key Name: " + public_name + ".key")
-					break
 
-			# Instancia la clase
-			Crypto = TeKrypto()
 
-			# Generar llaves (nombre de las llaves sin extensión y el tamaño de la llave)
-			Crypto.generaLLaves(private_name, public_name, 4096)
+	if Crypto.mode == 'Manual':
+		if args:
+			if args.action == "generate_keys":
+				print(Colorize.YELLOW + "Generating keys -->" + Colorize.END)
+				while True:
+					try:
+						private_name = input("Enter the private_key name with no extension 'private_key_name': ")
+						if not private_name:
+							continue
+						if True != Crypto.validate_key_name(private_name):
+							continue
+						if True == Crypto.keyExist(private_name):
+							print(Colorize.RED + "Warning! Key name already exists. Do you want to overwrite it?" + Colorize.END)
+							override_confirm = input("Enter [y|n]: ")
+							if override_confirm != "y" and override_confirm != "n":
+								continue
+							if override_confirm == "y":
+								pass
+							elif override_confirm == "n":
+								print(Colorize.RED + "Operation cancelled!" + Colorize.END)
+								exit()
 
-		elif args.action == "encrypt":
+					except ValueError:
+						print("error")
+					else:
+						print(Colorize.GREEN + "Private Key Name: " + Colorize.END + private_name + ".pem")
+						break
+				while True:
+					try:
+						public_name = input("Enter the public_key name file with no extension 'public_key_name': ")
+						if not public_name:
+							continue
+						if True != Crypto.validate_key_name(public_name):
+							continue
+						if True == Crypto.keyExist(private_name):
+							print(Colorize.RED + "Warning! Key name already exists. Do you want to overwrite it?" + Colorize.END)
+							override_confirm = input("Enter [y|n]: ")
+							if override_confirm != "y" and override_confirm != "n":
+								continue
+							if override_confirm == "y":
+								pass
+							elif override_confirm == "n":
+								print(Colorize.RED + "Operation cancelled!" + Colorize.END)
+								exit()
 
-			while True:
-				try:
-					path = input("Indicate the path of the file/directory to encrypt: ")
+					except ValueError:
+						print("error")
+					else:
+						print(Colorize.GREEN + "Public Key Name: " + Colorize.END + public_name + ".pem")
+						break
 
-					if not os.path.isdir(path) and not os.path.isfile(path):
-						print("The directory or file does not exist")
-						continue
+				# Generar llaves (nombre de las llaves sin extensión y el tamaño de la llave)
+				Crypto.generaLLaves(private_name, public_name, 4096)
 
-				except ValueError:
-					print("error")
-				else:
-					if os.path.isdir(path):
-						type = "d"
-					if os.path.isfile(path):
-						type = "f"
-					break
+			elif args.action == "encrypt":
+				print(Colorize.YELLOW + "Encrypting -->" + Colorize.END)
+				while True:
+					try:
+						path = input("Indicate the path of the file/directory to encrypt: ")
+						encrypt_path = Crypto.data_path + path
+						print(encrypt_path)
+						if not os.path.isdir(encrypt_path) and not os.path.isfile(encrypt_path):
+							print("The directory or file does not exist")
+							continue
 
-			while True:
-				try:
-					preserve = input("Do you want to preserve the unencrypted file/directory? Type 'y' for yes and 'n' for no. ")
+					except ValueError:
+						print("error")
+					else:
+						if os.path.isdir(encrypt_path):
+							type = "d"
+						if os.path.isfile(encrypt_path):
+							type = "f"
+						break
 
-					if preserve != "y" and preserve != "n":
-						continue
-				except ValueError:
-					print("error")
-				else:
-					if preserve == "y":
-						prsv = True
-					if preserve == "n":
-						prsv = False
-					break
+				while True:
+					try:
+						preserve = input("Do you want to preserve the unencrypted file/directory? Type [y|n]. ")
 
-			while True:
-				try:
-					key = input("Indicate the name of the 'public_key.pem' with which you want to encrypt: ")
-					if not os.path.isfile("keys/"+key):
-						print("The key does not exist")
-						continue
-				except ValueError:
-					print("error")
-				else:
-					break
-			print(Colorize.YELLOW + "Starting encryption process -->" + Colorize.END)
-			# Instancia la clase
-			Crypto = TeKrypto()
+						if preserve != "y" and preserve != "n":
+							continue
+					except ValueError:
+						print("error")
+					else:
+						if preserve == "y":
+							prsv = True
+						if preserve == "n":
+							prsv = False
+						break
 
-			# Selecciona la llave pública con la que encriptar
-			Crypto.usaLlave(key, 'public')
+				while True:
+					try:
+						key = input("Indicate the name of the 'public_key.pem' with which you want to encrypt: ")
+						if not os.path.isfile("keys/"+key):
+							print("The key does not exist")
+							continue
+					except ValueError:
+						print("error")
+					else:
+						break
+				print(Colorize.YELLOW + "Starting encryption process -->" + Colorize.END)
 
-			if type == "f":
-				# Encriptar un archivo
-				Crypto.encriptaArchivo(path, prsv)
+				# Selecciona la llave pública con la que encriptar
+				Crypto.usaLlave(key, 'public')
 
-			if type == "d":
-				# Encriptar un directorio
-				Crypto.encriptaDirectorio(path, prsv)
+				if type == "f":
+					# Encriptar un archivo
+					Crypto.encriptaArchivo(encrypt_path, prsv)
 
-			print(Colorize.YELLOW + "Directory/file successfully encrypted: " + Colorize.END + path)
+				if type == "d":
+					# Encriptar un directorio
+					Crypto.encriptaDirectorio(encrypt_path, prsv)
 
-		elif args.action == "decrypt":
+				print(Colorize.YELLOW + "Directory/file successfully encrypted: " + Colorize.END + path)
 
-			while True:
-				try:
-					path = input("Indicate the path of the directory/file to decrypt: ")
+			elif args.action == "decrypt":
+				print(Colorize.YELLOW + "Decrypting -->" + Colorize.END)
+				while True:
+					try:
+						path = input("Indicate the path of the directory/file to decrypt: ")
+						decrypt_path = Crypto.data_path + path
+						if not os.path.isdir(decrypt_path) and not os.path.isfile(decrypt_path):
+							print("The directory or file does not exist")
+							continue
 
-					if not os.path.isdir(path) and not os.path.isfile(path):
-						print("The directory or file does not exist")
-						continue
+					except ValueError:
+						print("error")
+					else:
+						if os.path.isdir(decrypt_path):
+							type = "d"
+						if os.path.isfile(decrypt_path):
+							type = "f"
+						break
+				while True:
+					try:
+						preserve = input("Do you want to preserve the decrypted directory/file? Type [y|n]. ")
 
-				except ValueError:
-					print("error")
-				else:
-					if os.path.isdir(path):
-						type = "d"
-					if os.path.isfile(path):
-						type = "f"
-					break
+						if preserve != "y" and preserve != "n":
+							continue
+					except ValueError:
+						print("error")
+					else:
+						if preserve == "y":
+							prsv = True
+						if preserve == "n":
+							prsv = False
+						break
 
-			while True:
-				try:
-					preserve = input("Do you want to preserve the decrypted directory/file? Type 'y' for yes and 'n' for no. ")
+				while True:
+					try:
+						key = input("Indicate the name of the 'private_key.pem' with which you want to decrypt: ")
+						if not os.path.isfile("keys/"+key):
+							print("The key does not exist")
+							continue
+					except ValueError:
+						print("error")
+					else:
+						break
 
-					if preserve != "y" and preserve != "n":
-						continue
-				except ValueError:
-					print("error")
-				else:
-					if preserve == "y":
-						prsv = True
-					if preserve == "n":
-						prsv = False
-					break
+				print(Colorize.YELLOW + "Starting decryption process -->" + Colorize.END)
 
-			while True:
-				try:
-					key = input("Indicate the name of the 'private_key.pem' with which you want to decrypt: ")
-					if not os.path.isfile("keys/"+key):
-						print("The key does not exist")
-						continue
-				except ValueError:
-					print("error")
-				else:
-					break
+				# Selecciona la llave pública con la que encriptar
+				Crypto.usaLlave(key, 'private')
 
-			print(Colorize.YELLOW + "Starting decryption process -->" + Colorize.END)
+				if type == "f":
+					# Desencriptar un archivo
+					Crypto.desencriptaArchivo(decrypt_path, prsv)
 
-			# Instancia la clase
-			Crypto = TeKrypto()
-
-			# Selecciona la llave pública con la que encriptar
-			Crypto.usaLlave(key, 'private')
-
-			if type == "f":
-				# Desencriptar un archivo
-				Crypto.desencriptaArchivo(path, prsv)
-
-			if type == "d":
-				# Desencriptar un directorio
-				Crypto.desencriptaDirectorio(path, prsv)
+				if type == "d":
+					# Desencriptar un directorio
+					Crypto.desencriptaDirectorio(decrypt_path, prsv)
