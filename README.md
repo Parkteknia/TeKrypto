@@ -1,9 +1,9 @@
 <img
-src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/01.png"
+src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/0102.png"
 alt="TeKrypto Home"
 />
 
-# TeKrypto v1.0
+# TeKrypto v1.0.2
 Una clase Python para encriptar y desencriptar datos.
 
 ## Características
@@ -13,45 +13,52 @@ La clase permite:
 * La encriptación y desencrptación mediante cifrado AES (Advanced Encryption Standard) de archivos/directorios
 
 ## Requerimientos
-La clase requiere el paquete [PyCryptodome](https://pycryptodome.readthedocs.io/en/latest/src/installation.html "PyCryptodome's Installation") el cual instala Crypto v. 3.9.7. y el resto de módulos necesarios.
+La clase requiere el paquete [PyCryptodome](https://pycryptodome.readthedocs.io/en/latest/src/installation.html "PyCryptodome's Installation") el cual instala Crypto v. 3.9.7.
 
 ```shell
 pip install pycryptodome
 ```
-## Uso
+## Configuración y modos de utilización
+En esta versión se ha añadido una funcionalidad nueva de configuración mediante el archivo config.ini, así TeCrypto podrá correr de forma manual, semi-manual y automatizada (para ser lanzado mediante CRON). Ahora solo está implementada la versión Manual.
+
+## Uso en modo "Manual"
 
 Lo primero es crear el par de llaves privada/publica.
+
+### Generación de Llaves
 
 Para crear las llaves se ejectua desde la terminal y se indican los nombres de las llaves:
 
 ```shell
-python3 TeKrypto.py -a generate_keys
-Generating keys -->
-Enter the name of the private key file without extension 'private_key_name': private
-Private Key Name: private.key
-Enter the name of the public key file without extension 'public_key_name': public
-Public Key Name: public.key
-The keys are generated and stored in the folder keys/
+python3 TeKrypto.py --action generate_keys
 ```
+<img
+src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/0102-generate-keys.png"
+alt="TeKrypto Generating Keys"
+/>
+
+### Encriptación de datos
 
 Una vez se han generado el par de llaves, para encriptar un archivo o directorio se ejecuta de la siguiente forma:
 ```shell
-python3 TeKrypto.py -a encrypt
-Indicate the path of the file/directory to encrypt: /home/user/my_files/
-Do you want to preserve the unencrypted file/directory? Type 'y' for yes and 'n' for no. n
-Indicate the name of the 'public_key.pem' with which you want to encrypt: public.pem
-Directory/File successfully encrypted: /home/user/my_files/
+python3 TeKrypto.py --action encrypt
 ```
-Para desencriptar un directorio:
+<img
+src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/0102-encrypting.png"
+alt="TeKrypto Generating Keys"
+/>
+### Desencriptación de datos
+
+Para desencriptar un archivo/directorio:
 
 ```shell
-python3 TeKrypto.py -a decrypt
-Indicate the path of the directory/file to decrypt: /home/user/my_files/
-Do you want to preserve the decrypted directory/file? Type 'y' for yes and 'n' for no. n
-Indicate the name of the 'private_key.pem' with which you want to decrypt: private.pem
-Directory successfully decrypted: /home/user/my_files/
+python3 TeKrypto.py --action decrypt
 ```
+<img
+src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/0102-decrypting.png"
+alt="TeKrypto Generating Keys"
+/>
 
-## FTP
+## FTP y SFTP
 
 * En desarrollo
