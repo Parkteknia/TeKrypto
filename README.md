@@ -20,8 +20,8 @@ La clase requiere el paquete [PyCryptodome](https://pycryptodome.readthedocs.io/
 pip install pycryptodome
 ```
 ## Configuración y modos de utilización
-En la versión 1.0.3 se añade la capacidad de encriptar los nombres de archivo.
-En la versión 1.0.2 se ha añadido la posibilidad de configurar mediante el archivo config.ini algunos parámetros.
+* En la versión 1.0.3 se añade la capacidad de encriptar los nombres de archivo.
+* En la versión 1.0.2 se ha añadido la posibilidad de configurar mediante el archivo config.ini algunos parámetros.
 
 Se comentan las variables de la sección General de configuración del archivo config.ini:
 ```shell
@@ -39,6 +39,10 @@ Para encriptar también los nombres de los archivos.
 Si quieres mantener tus llaves en otra hubicación puedes indicar la ruta absoluta a tu repositorio de llaves.
 ##### DefaultDataPath: (Absolute Path, c:/data_folder or /home/user/data_folder, etc.)
 Si quieres indicar la ruta absoluta donde se encuentra tu carpeta de datos, de este modo cuando encriptas o desencriptas puedes indicar solo el nombre de la carpeta con la que quieres trabajar sin necesidad de indicar la ruta absoluta. Tambien será necesario para correr en modo Automate.
+
+## Uso en modo "Test"
+
+El modo test se ha incluído para tareas de desarrollo, pero dependiendo del uso que se le quiera dar a TeKrypto puede ser útil para realizar llamadas directas a las funciones. De momento si configuras desde el config.ini el Mode: Test, deberás escribir tus funciones a partir de la línea 561 del archivo TeKrypto.py.
 
 ## Uso en modo "Manual"
 
