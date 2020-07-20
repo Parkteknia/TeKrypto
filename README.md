@@ -70,6 +70,11 @@ alt="TeKrypto Generating Keys"
 Si se ha puesto a True la variable EncryptNames en el archivo de configuración config.ini, el archivo encriptado tendrá la siguiente forma para cada fichero cuyo nombre de archivo también se quiera encriptar. Si se observa, el primero de la lista es el que contiene los datos encriptados, el resto de archivos de un tamaño de 0 bytes, se usan para poder guardar el nombre encriptado y poder desencriptarlo en un futuro.
 
 Se ha tenido que optar por esta solución debido a la longitud que adopta un string encriptado mediante el algoritmo que usa TeKrypto y las limitaciones en cuanto a longitud máxima para nombres de archivo en los diferentes S.O.
+
+Cada archivo contiene un identificador TCBATCH {1595188009} que indica los archivos únicos que le pertenecen. Un índice {-0-} que indica el orden correcto en que debe leerse la encryptación codificada (base16) y la codificación  {...738295A870B980F0A3A90EFD233058E4ACD9C5AF...} (128 carácteres), y la extensión .crypt.
+```shell
+TCBATCH1595188009-0-738295A870B980F0A3A90EFD233058E4ACD9C5AF41B3C389551F07D67EDEFA828382DDCFCD1D4864EFF443DEDACE4CC530B7743B044CBE0BFF2991736DCA4068.crypt
+```
 <img
 src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/0103-encrypted-filenames.png"
 alt="TeKrypto Generating Keys"
