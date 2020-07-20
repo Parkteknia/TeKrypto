@@ -331,6 +331,9 @@ class TeKrypto():
 					self.encriptaArchivo(folder + "/" + filename, preserva)
 					dest.write(folder + filename  + '\n')
 					
+					if False == preserva:
+						os.remove(folder + "/" + filename)
+					
 
 	######################################################################################
 	#
