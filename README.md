@@ -10,7 +10,7 @@ Una clase Python para encriptar y desencriptar datos.
 
 La clase permite:
 * La creación del par de llaves privada/pública
-* La encriptación y desencrptación de archivos/directorios mediante cifrado <a href="https://es.wikipedia.org/wiki/Advanced_Encryption_Standard" title="Advanced Encryption Standar">AES (Advanced Encryption Standard)</a> y el modo <a href="https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/proposed-modes/eax/eax-spec.pdf" title="EAX">EAX</a> disponible en PyCryptodome.
+* La encriptación y desencriptación de archivos/directorios mediante cifrado <a href="https://es.wikipedia.org/wiki/Advanced_Encryption_Standard" title="Advanced Encryption Standar">AES (Advanced Encryption Standard)</a> y el modo <a href="https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/proposed-modes/eax/eax-spec.pdf" title="EAX">EAX</a> disponible en PyCryptodome.
 * La encriptación de los nombres de archivo
 
 ## Requerimientos
@@ -23,23 +23,29 @@ pip install pycryptodome
 * En la versión 1.0.3 se añade la capacidad de encriptar los nombres de archivo.
 * En la versión 1.0.2 se ha añadido la posibilidad de configurar mediante el archivo config.ini algunos parámetros.
 
-Se comentan las variables de la sección General de configuración del archivo config.ini:
+Se comentan las variables de la sección General y Keys de configuración del archivo config.ini:
 ```shell
 [General]
-Mode: Manual 
-EncryptNames: False 
-KeysPath:
+Mode: Manual
+EncryptNames: True
 DefaultDataPath:
+PreserveFiles:
+
+[Keys]
+KeysPath:
+PrivateKey:
+PublicKey:
 ```
 ##### Mode: (Test, Manual, Semi-Manual, Automate)
 En esta versión los únicos modos funcionales son el Test y el Manual. En breve el resto.
 ##### EncryptNames: (False, True)
 Para encriptar también los nombres de los archivos.
-##### KeysPath: (Absolute Path, c:/files or /home/user/files, etc.)
-Si quieres mantener tus llaves en otra hubicación puedes indicar la ruta absoluta a tu repositorio de llaves.
 ##### DefaultDataPath: (Absolute Path, c:/data_folder or /home/user/data_folder, etc.)
 Si quieres indicar la ruta absoluta donde se encuentra tu carpeta de datos, de este modo cuando encriptas o desencriptas puedes indicar solo el nombre de la carpeta con la que quieres trabajar sin necesidad de indicar la ruta absoluta. Tambien será necesario para correr en modo Automate.
-
+##### PreserveFiles: (False, True)
+Para que no se eliminen los archivos durante el proceso (TODO: activarlo a través del config, solo funciona el preserve en modo manual.)
+##### KeysPath: (Absolute Path, c:/files or /home/user/files, etc.)
+Si quieres mantener tus llaves en otra hubicación puedes indicar la ruta absoluta a tu repositorio de llaves.
 ## Uso en modo "Test"
 
 El modo test se ha incluído para tareas de desarrollo, pero dependiendo del uso que se le quiera dar a TeKrypto puede ser útil para realizar llamadas directas a las funciones. De momento si configuras desde el config.ini el Mode: Test, deberás escribir tus funciones a partir de la línea 561 del archivo TeKrypto.py.
