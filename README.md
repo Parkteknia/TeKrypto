@@ -11,7 +11,7 @@ Una clase Python para encriptar y desencriptar datos.
 La clase permite:
 * La creación del par de llaves privada/pública
 * La encriptación y desencrptación de archivos/directorios mediante cifrado <a href="https://es.wikipedia.org/wiki/Advanced_Encryption_Standard" title="Advanced Encryption Standar">AES (Advanced Encryption Standard)</a> y el modo <a href="https://csrc.nist.gov/csrc/media/projects/block-cipher-techniques/documents/bcm/proposed-modes/eax/eax-spec.pdf" title="EAX">EAX</a> disponible en PyCryptodome.
-* La encriptación de los nombres de los archivos
+* La encriptación de los nombres de archivo
 
 ## Requerimientos
 La clase requiere el paquete [PyCryptodome](https://pycryptodome.readthedocs.io/en/latest/src/installation.html "PyCryptodome's Installation") el cual instala Crypto v. 3.9.7.
