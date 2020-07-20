@@ -3,7 +3,7 @@ src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/0103.png"
 alt="TeKrypto Home"
 />
 
-# TeKrypto v1.0.2
+# TeKrypto v1.0.3
 Una clase Python para encriptar y desencriptar datos.
 
 ## Características
@@ -20,7 +20,7 @@ La clase requiere el paquete [PyCryptodome](https://pycryptodome.readthedocs.io/
 pip install pycryptodome
 ```
 ## Configuración y modos de utilización
-En la versión 1.0.3 se añade la capacidad de encrptar los nombres de archivos.
+En la versión 1.0.3 se añade la capacidad de encriptar los nombres de archivo.
 En la versión 1.0.2 se ha añadido la posibilidad de configurar mediante el archivo config.ini algunos parámetros.
 
 Se comentan las variables de la sección General de configuración del archivo config.ini:
