@@ -108,3 +108,10 @@ alt="TeKrypto Generating Keys"
 ## FTP y SFTP
 
 * En desarrollo
+
+## TODO
+* Los logs no se guardan del todo bien
+* La automatización
+* Unificar el idioma de la clase. :-D
+* FTP/SFTP
+* ...
