@@ -3,6 +3,8 @@
 
 import os
 import sys
+import calendar;
+import time;
 import platform
 import re
 import configparser
@@ -10,24 +12,15 @@ import argparse
 import readline
 import base64
 
+
 from Crypto.PublicKey import RSA
 from Crypto.Random import get_random_bytes
 from Crypto.Cipher import AES, PKCS1_OAEP
-from libs.FTP import TeFTP
 
+from libs.Colorize import Colorize
 from libs.Banner import get_banner
 
-class Colorize:
-	PURPLE = '\033[95m'
-	CYAN = '\033[96m'
-	DARKCYAN = '\033[36m'
-	BLUE = '\033[94m'
-	GREEN = '\033[92m'
-	YELLOW = '\033[93m'
-	RED = '\033[91m'
-	BOLD = '\033[1m'
-	UNDERLINE = '\033[4m'
-	END = '\033[0m'
+from libs.FTP import TeFTP
 
 
 class TeKrypto():
@@ -44,10 +37,11 @@ class TeKrypto():
 	def __init__(self):
 
 		self.global_error = False
-		self.keys_path = self.load_config('General', 'KeysPath')
+		self.keys_path = self.load_config('Keys', 'KeysPath')
 		self.data_path = self.load_config('General', 'DefaultDataPath')
 		self.keys = {'private': '', 'public': ''}
 		self.mode = self.load_config('General', 'Mode')
+		self.enames = self.load_config('General', 'EncryptNames')
 		self.computer = self.load_platform()
 
 
@@ -69,7 +63,7 @@ class TeKrypto():
 		if param == "KeysPath":
 			kpath = config.get(section, param)
 			if not kpath:
-			    return os.path.dirname(os.path.realpath(__file__)) + "/keys/"
+				return os.path.dirname(os.path.realpath(__file__)) + "/keys/"
 			return kpath
 		return config.get(section, param)
 
@@ -178,6 +172,56 @@ class TeKrypto():
 
 	######################################################################################
 	#
+	# Encriptar nombre archivo
+	#
+	# Args:
+	#	archivo (str): El nombre del archivo cuyo nombre encriptar
+	##
+
+	def encryptFileName(self, filename):
+		
+		self.public_key = RSA.importKey(open("keys/public.pem").read())
+
+		filename = filename.encode("utf-8")
+
+		session_key = get_random_bytes(16)
+		
+		cipher_rsa = PKCS1_OAEP.new(self.public_key)
+		enc_session_key = cipher_rsa.encrypt(session_key)
+
+		cipher_aes = AES.new(session_key, AES.MODE_EAX)
+		ciphertext, tag = cipher_aes.encrypt_and_digest(filename)
+		data = b"".join([x for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext)])
+		
+		return base64.b16encode(data).decode("utf-8")
+		
+	######################################################################################
+	#
+	# Desencriptar nombre archivo
+	#
+	# Args:
+	#	archivo (str): El nombre del archivo cuyo nombre desencriptar
+	##
+
+	def decryptFileName(self, c):
+		
+		self.private_key = RSA.importKey(open("keys/private.pem").read())
+		
+		enc_session_key = c[:self.private_key.size_in_bytes()]
+		nonce = c[self.private_key.size_in_bytes():self.private_key.size_in_bytes()+16]
+		tag = c[self.private_key.size_in_bytes()+16:self.private_key.size_in_bytes()+32]
+		ciphertext = c[self.private_key.size_in_bytes()+32:]
+
+		cipher_rsa = PKCS1_OAEP.new(self.private_key)
+		session_key = cipher_rsa.decrypt(enc_session_key)
+
+		cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
+		data = cipher_aes.decrypt_and_verify(ciphertext, tag)
+
+		return data.decode("utf-8")
+
+	######################################################################################
+	#
 	# Encriptar archivo
 	#
 	# Args:
@@ -191,6 +235,8 @@ class TeKrypto():
 		self.rsa_public_key = PKCS1_OAEP.new(rsa_public_key)
 
 		contenido = self.leeArchivo(archivo)
+		
+		origin_file = archivo
 
 		archivo = archivo + ".crypt"
 
@@ -200,6 +246,13 @@ class TeKrypto():
 		cipher_aes = AES.new(session_key, AES.MODE_EAX)
 
 		self.guardaArchivoEncriptado(archivo, contenido, enc_session_key, cipher_aes)
+				
+		if self.enames:
+			file_path = self.getFilenameAndPath(archivo)
+			ename = self.encryptFileName(file_path[1][:-6])
+			self.saveBatchedFile(file_path[0], archivo, ename)
+			
+		
 
 
 	######################################################################################
@@ -212,8 +265,18 @@ class TeKrypto():
 	##
 
 	def desencriptaArchivo(self, archivo, preserva):
-
-		#contenido = self.leeArchivo(archivo)
+		
+		decompose_file = self.getFilenameAndPath(archivo)
+				
+		bfile = self.extractBatchFile(decompose_file[1])
+				
+		if self.isBatchFile(decompose_file[1]):
+			batch_info = self.extractBatchFile(decompose_file[1])
+			unencrypted_name_code = self.readNameFromBatchFiles(decompose_file[0], batch_info[0])
+			original_name = self.decryptFileName(unencrypted_name_code)
+			self.removeBatchFiles(decompose_file[0], original_name, bfile[0])
+			archivo = decompose_file[0] + "/" + original_name + ".crypt"
+		
 		contenido = open(archivo, "rb")
 		nombre_archivo = archivo[:-6] #Eliminar .crypt del nombre
 
@@ -222,7 +285,9 @@ class TeKrypto():
 
 		enc_session_key, nonce, tag, ciphertext = \
 			[ contenido.read(x) for x in (rsa_private_key.size_in_bytes(), 16, 16, -1) ]
-
+		
+		if self.isBatchFile(decompose_file[1]):
+			os.remove(nombre_archivo + ".crypt")
 		# Decrypt the session key with the private RSA key
 		try:
 			session_key = self.rsa_private_key.decrypt(enc_session_key)
@@ -236,11 +301,14 @@ class TeKrypto():
 		# Decrypt the data with the AES session key
 		cipher_aes = AES.new(session_key, AES.MODE_EAX, nonce)
 		data = cipher_aes.decrypt_and_verify(ciphertext, tag)
-
-
+		
+		
 		file_out = open(nombre_archivo, "wb")
 		file_out.write(data)
 		file_out.close()
+		
+		if False == preserva:
+			os.remove(archivo)
 
 
 
@@ -262,8 +330,7 @@ class TeKrypto():
 				for filename in files:
 					self.encriptaArchivo(folder + "/" + filename, preserva)
 					dest.write(folder + filename  + '\n')
-					if False == preserva:
-						os.remove(folder + "/" + filename)
+					
 
 	######################################################################################
 	#
@@ -277,20 +344,44 @@ class TeKrypto():
 	def desencriptaDirectorio(self, directorio, preserva):
 
 		rootdir = directorio
+		batched_files = []
+		batched_timestamps = {}
+		normal_files = []
 
 		for folder, subs, files in os.walk(rootdir):
 			with open(os.path.join('logs/python-outfile.txt'), 'w') as dest:
-				for filename in files:
+				for filename in sorted(files):
+					#kk
+					if(folder + "/" + filename != folder + "/" + 'python-outfile.txt'):
+						if os.path.splitext(folder + "/" + filename)[1] != ".crypt":
+							self.global_error = True
+							break
+						if self.isBatchFile(filename):
+							timestamp_file = self.extractBatchFile(filename)[0]
+							
+							if timestamp_file not in batched_timestamps:
+								batched_timestamps[timestamp_file] = {}
+								batched_timestamps[timestamp_file]['files'] = []
+								batched_timestamps[timestamp_file]['code'] = ""
+								batched_timestamps[timestamp_file]['files'].append(folder + "/" + filename)
+							else:
+								batched_timestamps[timestamp_file]['files'].append(folder + "/" + filename)
+		
+		if len(batched_timestamps) != 0:
+			self.prepareBatchFilesDecrypt(rootdir, batched_timestamps)
+		
+		
+		for folder, subs, files in os.walk(rootdir):
+			with open(os.path.join('logs/python-outfile.txt'), 'w') as dest:
+				for filename in sorted(files):
 					#kk
 					if(folder + "/" + filename != folder + "/" + 'python-outfile.txt'):
 						if os.path.splitext(folder + "/" + filename)[1] != ".crypt":
 							self.global_error = True
 							break
 						self.desencriptaArchivo(folder + "/" + filename, preserva)
-						#dest.write(folder + filename  + '\n')
-					if False == preserva:
-						os.remove(folder + "/" + filename)
-
+						dest.write(folder + filename  + '\n')
+		
 		if self.global_error == False:
 			print(Colorize.YELLOW + "Directory successfully decrypted: " + Colorize.END + directorio)
 		else:
@@ -333,7 +424,25 @@ class TeKrypto():
 		ciphertext, tag = cipher_aes.encrypt_and_digest(contenido)
 		[ file_out.write(x) for x in (enc_session_key, cipher_aes.nonce, tag, ciphertext) ]
 
+	######################################################################################
+	#
+	# Guarda los archivos necesarios para guardar el nombre del archivo codificado
+	#
+	# Args:
+	#	file_data (str): La encriptación codificada en base16
+	#
+	##
 
+	def saveBatchedFile(self, path, original_file, file_data):
+		n = 128
+		chunks = [file_data[i:i+n] for i in range(0, len(file_data), n)]
+		timestamp = self.getTimeStamp()
+		for i, c in enumerate(chunks):
+			if i == 0:
+				os.rename(original_file,path +"/TCBATCH"+str(timestamp)+"-"+str(i)+"-"+str(c)+".crypt")
+				continue
+			open(path + "/TCBATCH"+str(timestamp)+"-"+str(i)+"-"+str(c)+".crypt", 'a').close()
+	
 	######################################################################################
 	#
 	# Desencripta y Guarda el Arcvhivo desencriptado
@@ -351,26 +460,97 @@ class TeKrypto():
 		file= archivo
 		with open(file, 'wb') as filetowrite:
 			filetowrite.write(self.rsa_private_key.encrypt(contenido))
+	
+	def getTimeStamp(self):
+		time.sleep(1)
+		ts = calendar.timegm(time.gmtime())
+		return ts
 
+	def getFilenameAndPath(self, pathfile):
+		basepath = os.path.dirname(os.path.abspath(pathfile))
+		filename = os.path.basename(pathfile)
+		
+		return basepath, filename
+	
+	def isBatchFile(self, filename):
+		if filename.startswith("TCBATCH"):
+			return True
+
+	def extractBatchFile(self, filename):
+		filename = filename[7:]
+		filename = filename[:-6]
+		
+		return filename.split("-")	
+		
+	def readNameFromBatchFiles(self, path, timestamp):
+		encoded_name = ""
+		for folder, subs, files in os.walk(path):
+			with open(os.path.join('logs/python-outfile.txt'), 'w') as dest:
+				for filename in sorted(files):
+					#kk
+					if(folder + "/" + filename != folder + "/" + 'python-outfile.txt'):
+						if os.path.splitext(folder + "/" + filename)[1] != ".crypt":
+							break
+						bfile = self.extractBatchFile(filename)
+						if bfile[0] == timestamp:
+							encoded_name += bfile[2]
+							
+		encoded_name = encoded_name.encode("utf-8")
+		return base64.b16decode(encoded_name)
+	
+	def prepareBatchFilesDecrypt(self, path, timestamps):
+		
+		for f in timestamps:
+			for x in timestamps[f]['files']:
+				path_parts = self.getFilenameAndPath(x)
+				bfile = self.extractBatchFile(path_parts[1])
+				timestamps[f]['code'] += bfile[2]
+		
+			
+		for i, f in enumerate(timestamps):
+				
+			encoded_name = timestamps[f]['code'].encode("utf-8")
+			decoded_name = base64.b16decode(encoded_name)
+			timestamps[f]['original_name'] = self.decryptFileName(decoded_name)
+	
+		for f in timestamps:
+			self.removeBatchFiles(path, timestamps[f]['original_name'], f)
+			
+		
+					
+	def removeBatchFiles(self, path, original_name, timestamp):
+		for folder, subs, files in os.walk(path):
+			with open(os.path.join('logs/python-outfile.txt'), 'w') as dest:
+				for filename in sorted(files):
+					#kk
+					if(folder + "/" + filename != folder + "/" + 'python-outfile.txt'):
+						if os.path.splitext(folder + "/" + filename)[1] != ".crypt":
+							break
+						bfile = self.extractBatchFile(filename)
+						if bfile[0] == timestamp:
+							if bfile[1] == "0":
+								os.rename(folder + "/" + filename, folder + "/" + original_name + ".crypt")
+								continue
+							os.remove(folder + "/" + filename)
 	def ftp(self, directorio):
 		return TeFTP(directorio)
 
 
 def get_args():
 	parser = argparse.ArgumentParser()
-	parser.add_argument('--action', type=str, required=True, help='Action to execute', choices=['generate_keys', 'encrypt', 'decrypt'])
+	parser.add_argument('--action', type=str, help='Action to execute', choices=['generate_keys', 'encrypt', 'decrypt'])
 	return parser.parse_args()
 
 if __name__ == '__main__':
 
 	# Print TeKrypto Banner
-	banner  = base64.b64decode(get_banner('1.0.2')).decode()
+	banner  = base64.b64decode(get_banner('1.0.3')).decode()
 	print(Colorize.YELLOW + Colorize.BOLD + "\n\n" + banner + Colorize.END)
 
 	# Create TeKrypto object
 	Crypto = TeKrypto()
 
-    #Print mode and environment info
+	#Print mode and environment info
 	print(Colorize.GREEN + "TeKrypto is configured in " + Colorize.END + Colorize.BOLD + Crypto.mode + Colorize.END + Colorize.GREEN  + " mode ->" + Colorize.END)
 	print(Colorize.GREEN + "Running in a " + Colorize.END + Colorize.BOLD + Crypto.computer['os'] + " " + Crypto.computer['release'] + Colorize.END + Colorize.GREEN  + " machine ->" + Colorize.END)
 	print("")
@@ -378,7 +558,11 @@ if __name__ == '__main__':
 	# Read args
 	args = get_args()
 
+	if Crypto.mode == "Test":
 
+		"""Run test here"""
+		#Crypto.usaLlave("private.pem", "private")
+		
 	if Crypto.mode == 'Manual':
 		if args:
 			if args.action == "generate_keys":
@@ -482,7 +666,9 @@ if __name__ == '__main__':
 
 				# Selecciona la llave pública con la que encriptar
 				Crypto.usaLlave(key, 'public')
-
+				
+				print(Colorize.YELLOW + "Encrypting, wait -->" + Colorize.END)
+				
 				if type == "f":
 					# Encriptar un archivo
 					Crypto.encriptaArchivo(encrypt_path, prsv)
@@ -541,7 +727,9 @@ if __name__ == '__main__':
 
 				# Selecciona la llave pública con la que encriptar
 				Crypto.usaLlave(key, 'private')
-
+				
+				print(Colorize.YELLOW + "Decrypting, wait -->" + Colorize.END)		
+				
 				if type == "f":
 					# Desencriptar un archivo
 					Crypto.desencriptaArchivo(decrypt_path, prsv)
