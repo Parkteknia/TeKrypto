@@ -31,8 +31,8 @@ EncryptNames: False
 KeysPath:
 DefaultDataPath:
 ```
-##### Mode: (Manual, Semi-Manual, Automate)
-En esta versión el único modo funcional es el Manual, pero en la siguiente se podrán lanzar procesos automatizados o aligerar más, si cabe, el modo manual.
+##### Mode: (Test, Manual, Semi-Manual, Automate)
+En esta versión los únicos modos funcionales son el Test y el Manual. En breve el resto.
 ##### EncryptNames: (False, True)
 Para encriptar también los nombres de los archivos.
 ##### KeysPath: (Absolute Path, c:/files or /home/user/files, etc.)
