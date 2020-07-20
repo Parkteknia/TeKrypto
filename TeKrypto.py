@@ -331,6 +331,9 @@ class TeKrypto():
 					self.encriptaArchivo(folder + "/" + filename, preserva)
 					dest.write(folder + filename  + '\n')
 					
+					if False == preserva:
+						os.remove(folder + "/" + filename)
+					
 
 	######################################################################################
 	#
@@ -450,8 +453,6 @@ class TeKrypto():
 	# Args:
 	#	archivo (str): El nombre del archivo  final encriptado
 	#	contenido (binary): Contenido de archivo a encriptar
-	#	enc_session_key (int): La session del proceso  de encriptamiento
-	#	cipher_aes: El cipher AES
 	#
 	##
 
@@ -460,28 +461,69 @@ class TeKrypto():
 		file= archivo
 		with open(file, 'wb') as filetowrite:
 			filetowrite.write(self.rsa_private_key.encrypt(contenido))
+			
+	######################################################################################
+	#
+	# Devuelve un timestamp, usado para crear los nombres de archivo encriptados
+	#
+	##	
 	
 	def getTimeStamp(self):
 		time.sleep(1)
 		ts = calendar.timegm(time.gmtime())
 		return ts
-
+	
+	######################################################################################
+	#
+	# Devuelve la ruta al directorio y el nombre de un archivo dado
+	#
+	# Args:
+	#	pathfile (str): El path del archivo
+	##
+	
 	def getFilenameAndPath(self, pathfile):
 		basepath = os.path.dirname(os.path.abspath(pathfile))
 		filename = os.path.basename(pathfile)
 		
 		return basepath, filename
 	
+	######################################################################################
+	#
+	# Comprueba si un archivo es parte de un batch
+	#
+	# Args:
+	#	filename (str): El nombre de un archivo
+	##
+	
 	def isBatchFile(self, filename):
 		if filename.startswith("TCBATCH"):
 			return True
 
+	######################################################################################
+	#
+	# Extrae los datos referenciales de un archivo batch y devuelve su timestamp, orden,
+	# y datos codificados
+	#
+	# Args:
+	#	filename (str): El nombre de un archivo
+	##
+	
 	def extractBatchFile(self, filename):
 		filename = filename[7:]
 		filename = filename[:-6]
 		
 		return filename.split("-")	
-		
+	
+	######################################################################################
+	#
+	# Devuelve todos los datos codificados de un archivo atravesando sus diferentes
+	# archivos batch. La salida que se obtiene se le puede pasar a decryptName(code)
+	#
+	# Args:
+	#	path (str): Ruta del archivo
+	#	timestamp (str): Su identificador timestamp
+	##		
+	
 	def readNameFromBatchFiles(self, path, timestamp):
 		encoded_name = ""
 		for folder, subs, files in os.walk(path):
@@ -497,6 +539,15 @@ class TeKrypto():
 							
 		encoded_name = encoded_name.encode("utf-8")
 		return base64.b16decode(encoded_name)
+
+	######################################################################################
+	#
+	# Prepara los archivos batch para ser desencriptados
+	#
+	# Args:
+	#	path (str): Ruta del archivo
+	#	timestamp (str): Su identificador timestamp
+	##
 	
 	def prepareBatchFilesDecrypt(self, path, timestamps):
 		
@@ -515,8 +566,17 @@ class TeKrypto():
 	
 		for f in timestamps:
 			self.removeBatchFiles(path, timestamps[f]['original_name'], f)
-			
-		
+
+	######################################################################################
+	#
+	# Renombra el archivo batch principal con su corresponiente nombre desencriptado y 
+	# elimina los inncecesarios
+	#
+	# Args:
+	#	path (str): Ruta del archivo
+	#	original_name (str): El nombre original del archivo
+	#	timestamp (str): El identificador timestamp
+	##
 					
 	def removeBatchFiles(self, path, original_name, timestamp):
 		for folder, subs, files in os.walk(path):
