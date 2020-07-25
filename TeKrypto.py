@@ -5,6 +5,7 @@ import os
 import sys
 import calendar;
 import time;
+from datetime import datetime
 import platform
 import re
 import configparser
@@ -40,10 +41,12 @@ class TeKrypto():
 		self.keys_path = self.load_config('Keys', 'KeysPath')
 		self.data_path = self.load_config('General', 'DefaultDataPath')
 		self.keys = {'private': '', 'public': ''}
+		self.keys_log = self.load_config('Keys', 'KeysLog')
+		self.encrypt_log = self.load_config('General', 'EncryptLog')
+		self.decrypt_log = self.load_config('General', 'DecryptLog')
 		self.mode = self.load_config('General', 'Mode')
 		self.enames = self.load_config('General', 'EncryptNames')
 		self.computer = self.load_platform()
-
 
 	######################################################################################
 	#
@@ -65,6 +68,10 @@ class TeKrypto():
 			if not kpath:
 				return os.path.dirname(os.path.realpath(__file__)) + "/keys/"
 			return kpath
+		if param == "KeysLog":
+			return config.getboolean(section, param)
+		if param == "EncryptLog" or param == "DecryptLog":
+			return config.getboolean(section, param)
 		return config.get(section, param)
 
 	######################################################################################
@@ -87,7 +94,7 @@ class TeKrypto():
 	# Args:
 	#	priv_key (str): El nombre de la llave privada sin extensión.
 	#	pub_key  (str): El nombre de la llave pública sin extensión.
-	#	 size	  (int): El tamaño de la llave (2048, 3072, 4096) bits.
+	#	size	  (int): El tamaño de la llave (2048, 3072, 4096) bits.
 	#
 	#	Returns:
 	#		bool: The return value. True for success, False otherwise.
@@ -111,7 +118,12 @@ class TeKrypto():
 		self.guardaLlave(self.keys['public'], llave_publica)
 
 		print(Colorize.GREEN +  "Keys stored in the " + Colorize.END + "keys/" + Colorize.GREEN + " folder:" + Colorize.END, self.keys)
+		
+		k = [self.keys['private'], self.keys['public']]
 
+		if True == self.keys_log:
+			self.saveLog("keys", k)
+ 
 	######################################################################################
 	#
 	# Key Exist
@@ -253,7 +265,8 @@ class TeKrypto():
 			self.saveBatchedFile(file_path[0], archivo, ename)
 			
 		
-
+		if True == self.encrypt_log:
+			self.saveLog("encrypt", origin_file)
 
 	######################################################################################
 	#
@@ -326,11 +339,10 @@ class TeKrypto():
 		rootdir = directorio
 
 		for folder, subs, files in os.walk(rootdir):
-			with open(os.path.join('logs/python-outfile.txt'), 'w') as dest:
+			with open('logs/tekrypto-encrypt.log', 'a') as dest:
+				dest.write(self.getCurrentDateTime() + " - Encrypted folder: " + folder  + '\n')
 				for filename in files:
 					self.encriptaArchivo(folder + "/" + filename, preserva)
-					dest.write(folder + filename  + '\n')
-					
 					if False == preserva:
 						os.remove(folder + "/" + filename)
 					
@@ -472,6 +484,16 @@ class TeKrypto():
 		time.sleep(1)
 		ts = calendar.timegm(time.gmtime())
 		return ts
+
+	######################################################################################
+	#
+	# Devuelve la fecha y hora presente
+	#
+	##	
+	
+	def getCurrentDateTime(self):
+		now = datetime.now()
+		return now.strftime("%d/%m%Y %H:%M:%S")
 	
 	######################################################################################
 	#
@@ -592,6 +614,36 @@ class TeKrypto():
 								os.rename(folder + "/" + filename, folder + "/" + original_name + ".crypt")
 								continue
 							os.remove(folder + "/" + filename)
+							
+	######################################################################################
+	#
+	# Save actions log
+	#
+	# Args:
+	#	dest (str): Log type (keys, encrypt, decrypt)
+	#	data (str): Data log
+	##
+					
+	def saveLog(self, dest, data):
+		
+		datetime_now = self.getCurrentDateTime()
+		
+		if dest == 'keys':
+			log_file = 'logs/tekrypto-keys.log'
+			try:
+				with open(log_file, 'a') as log:
+					log.write(datetime_now + "- Generated: " + str(data) + '\n')
+			except Exception as Error:
+				print(Error)
+		
+		if dest == 'encrypt':
+			log_file = 'logs/tekrypto-encrypt.log'
+			try:
+				with open(log_file, 'a') as log:
+					log.write(datetime_now + "- Encrypted: " + str(data) + '\n')
+			except Exception as Error:
+				print(Error)
+
 	def ftp(self, directorio):
 		return TeFTP(directorio)
 
@@ -621,7 +673,7 @@ if __name__ == '__main__':
 	if Crypto.mode == "Test":
 
 		"""Run test here"""
-		#Crypto.usaLlave("private.pem", "private")
+		#Crypto.usaLlave("public.pem", "public")
 		
 	if Crypto.mode == 'Manual':
 		if args:
