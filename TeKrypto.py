@@ -26,14 +26,12 @@ from libs.FTP import TeFTP
 
 class TeKrypto():
 
-
 	######################################################################################
 	#
 	# Inicializa la clase y el objeto keys
 	#
 	#
 	##
-
 
 	def __init__(self):
 
@@ -85,7 +83,6 @@ class TeKrypto():
 		system = {'os': platform.system(), 'release': platform.release()}
 
 		return system
-
 
 	######################################################################################
 	#
@@ -246,7 +243,7 @@ class TeKrypto():
 		rsa_public_key = RSA.importKey(open(self.keys['public']).read())
 		self.rsa_public_key = PKCS1_OAEP.new(rsa_public_key)
 
-		contenido = self.leeArchivo(archivo)
+		contenido = self.readFile(archivo)
 		
 		origin_file = archivo
 
@@ -257,7 +254,7 @@ class TeKrypto():
 
 		cipher_aes = AES.new(session_key, AES.MODE_EAX)
 
-		self.guardaArchivoEncriptado(archivo, contenido, enc_session_key, cipher_aes)
+		self.saveEncryptedFile(archivo, contenido, enc_session_key, cipher_aes)
 				
 		if self.enames:
 			file_path = self.getFilenameAndPath(archivo)
@@ -413,7 +410,7 @@ class TeKrypto():
 	#	 arcvhio binario contents
 	##
 
-	def leeArchivo(self, archivo):
+	def readFile(self, archivo):
 
 		file = open(archivo, "rb")
 		contenido = file.read()
@@ -432,7 +429,7 @@ class TeKrypto():
 	#
 	##
 
-	def guardaArchivoEncriptado(self, archivo, contenido, enc_session_key, cipher_aes):
+	def saveEncryptedFile(self, archivo, contenido, enc_session_key, cipher_aes):
 
 		file_out = open(archivo, "wb")
 
@@ -468,7 +465,7 @@ class TeKrypto():
 	#
 	##
 
-	def guardaArchivoDesencriptado(self, archivo, contenido):
+	def saveDecryptedFile(self, archivo, contenido):
 
 		file= archivo
 		with open(file, 'wb') as filetowrite:
