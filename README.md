@@ -105,12 +105,7 @@ src="https://github.com/Arteknia/TeKrypto-Docs/blob/master/0103-decrypting.png"
 alt="TeKrypto Generating Keys"
 />
 
-## FTP y SFTP
-
-* En desarrollo
-
 ## TODO
 * La automatización
-* Unificar el idioma de la clase. :-D
 * FTP/SFTP
 * ...
