@@ -100,7 +100,7 @@ class TeKrypto():
 	#		bool: The return value. True for success, False otherwise.
 	##
 
-	def generaLLaves(self, priv_key, pub_key, size):
+	def generateKeys(self, priv_key, pub_key, size):
 
 		# Llave privada
 		llave = RSA.generate(size)
@@ -108,14 +108,14 @@ class TeKrypto():
 
 		# Guarda archivo/llave PEM privada
 		self.keys['private'] = self.keys_path + priv_key + '.pem'
-		self.guardaLlave(self.keys['private'], llave_privada)
+		self.saveKey(self.keys['private'], llave_privada)
 
 		# Llave pública
 		llave_publica = llave.publickey().exportKey('PEM')
 
 		# Guarda archivo/llave PEM pública
 		self.keys['public'] = self.keys_path + pub_key + '.pem'
-		self.guardaLlave(self.keys['public'], llave_publica)
+		self.saveKey(self.keys['public'], llave_publica)
 
 		print(Colorize.GREEN +  "Keys stored in the " + Colorize.END + "keys/" + Colorize.GREEN + " folder:" + Colorize.END, self.keys)
 		
@@ -164,7 +164,7 @@ class TeKrypto():
 	#	llave  (str): La llave
 	##
 
-	def guardaLlave(self, archivo, llave):
+	def saveKey(self, archivo, llave):
 
 		file = open(archivo,"wb")
 		file.write(llave)
@@ -179,7 +179,7 @@ class TeKrypto():
 	#	tipo  (str): publica/privada
 	##
 
-	def usaLlave(self, nombre_llave, tipo):
+	def useKey(self, nombre_llave, tipo):
 		self.keys[tipo] = self.keys_path + nombre_llave
 
 	######################################################################################
@@ -241,7 +241,7 @@ class TeKrypto():
 	#	 preserva (bool) : Si machaca original o guarda nuevo
 	##
 
-	def encriptaArchivo(self, archivo, preserva):
+	def encryptFile(self, archivo, preserva):
 
 		rsa_public_key = RSA.importKey(open(self.keys['public']).read())
 		self.rsa_public_key = PKCS1_OAEP.new(rsa_public_key)
@@ -277,7 +277,7 @@ class TeKrypto():
 	#	 preserva (bool) : Si machaca original o guarda nuevo
 	##
 
-	def desencriptaArchivo(self, archivo, preserva):
+	def decryptFile(self, archivo, preserva):
 		
 		decompose_file = self.getFilenameAndPath(archivo)
 				
@@ -334,7 +334,7 @@ class TeKrypto():
 	#	 preserva (bool) : Si machaca original o guarda nuevo
 	##
 
-	def encriptaDirectorio(self, directorio, preserva):
+	def encryptDirectory(self, directorio, preserva):
 
 		rootdir = directorio
 
@@ -342,7 +342,7 @@ class TeKrypto():
 			with open('logs/tekrypto-encrypt.log', 'a') as dest:
 				dest.write(self.getCurrentDateTime() + " - Encrypted folder: " + folder  + '\n')
 				for filename in files:
-					self.encriptaArchivo(folder + "/" + filename, preserva)
+					self.encryptFile(folder + "/" + filename, preserva)
 					if False == preserva:
 						os.remove(folder + "/" + filename)
 					
@@ -356,7 +356,7 @@ class TeKrypto():
 	#	 preserva (bool) : Si machaca original o guarda nuevo
 	##
 
-	def desencriptaDirectorio(self, directorio, preserva):
+	def decryptDirectory(self, directorio, preserva):
 
 		rootdir = directorio
 		batched_files = []
@@ -394,7 +394,7 @@ class TeKrypto():
 						if os.path.splitext(folder + "/" + filename)[1] != ".crypt":
 							self.global_error = True
 							break
-						self.desencriptaArchivo(folder + "/" + filename, preserva)
+						self.decryptFile(folder + "/" + filename, preserva)
 						dest.write(folder + filename  + '\n')
 		
 		if self.global_error == False:
@@ -673,7 +673,7 @@ if __name__ == '__main__':
 	if Crypto.mode == "Test":
 
 		"""Run test here"""
-		#Crypto.usaLlave("public.pem", "public")
+		#Crypto.useKey("public.pem", "public")
 		
 	if Crypto.mode == 'Manual':
 		if args:
@@ -727,7 +727,7 @@ if __name__ == '__main__':
 						break
 
 				# Generar llaves (nombre de las llaves sin extensión y el tamaño de la llave)
-				Crypto.generaLLaves(private_name, public_name, 4096)
+				Crypto.generateKeys(private_name, public_name, 4096)
 
 			elif args.action == "encrypt":
 				print(Colorize.YELLOW + "Encrypting -->" + Colorize.END)
@@ -777,17 +777,17 @@ if __name__ == '__main__':
 				print(Colorize.YELLOW + "Starting encryption process -->" + Colorize.END)
 
 				# Selecciona la llave pública con la que encriptar
-				Crypto.usaLlave(key, 'public')
+				Crypto.useKey(key, 'public')
 				
 				print(Colorize.YELLOW + "Encrypting, wait -->" + Colorize.END)
 				
 				if type == "f":
 					# Encriptar un archivo
-					Crypto.encriptaArchivo(encrypt_path, prsv)
+					Crypto.encryptFile(encrypt_path, prsv)
 
 				if type == "d":
 					# Encriptar un directorio
-					Crypto.encriptaDirectorio(encrypt_path, prsv)
+					Crypto.encryptDirectory(encrypt_path, prsv)
 
 				print(Colorize.YELLOW + "Directory/file successfully encrypted: " + Colorize.END + path)
 
@@ -838,14 +838,14 @@ if __name__ == '__main__':
 				print(Colorize.YELLOW + "Starting decryption process -->" + Colorize.END)
 
 				# Selecciona la llave pública con la que encriptar
-				Crypto.usaLlave(key, 'private')
+				Crypto.useKey(key, 'private')
 				
 				print(Colorize.YELLOW + "Decrypting, wait -->" + Colorize.END)		
 				
 				if type == "f":
 					# Desencriptar un archivo
-					Crypto.desencriptaArchivo(decrypt_path, prsv)
+					Crypto.decryptFile(decrypt_path, prsv)
 
 				if type == "d":
 					# Desencriptar un directorio
-					Crypto.desencriptaDirectorio(decrypt_path, prsv)
+					Crypto.decryptDirectory(decrypt_path, prsv)
